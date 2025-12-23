@@ -160,9 +160,9 @@ export function showQuickFixMenu(
     return true;
   }
 
-  // For multiple fixes, apply the first one (in a real implementation,
-  // this would show a menu for the user to choose)
-  // TODO: Implement proper menu UI
-  applyQuickFix(view, fixes[0]!);
-  return true;
+  // Multiple fixes available - do not auto-apply without user choice.
+  // A proper menu UI would be needed for the user to select which fix to apply.
+  // For now, return false to indicate the command was not handled.
+  // TODO: Implement proper menu UI for MarkEdit native integration
+  return false;
 }

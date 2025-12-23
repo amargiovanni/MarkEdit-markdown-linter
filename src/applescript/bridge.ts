@@ -104,8 +104,8 @@ export function createAppleScriptBridge(): AppleScriptBridge {
           };
         }
 
-        // Validate input
-        if (!input.content && input.content !== "") {
+        // Validate input - use == null for idiomatic null/undefined check
+        if (input.content == null) {
           return {
             success: false,
             error: "Missing required parameter: content",
