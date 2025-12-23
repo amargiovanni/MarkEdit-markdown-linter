@@ -115,20 +115,16 @@ function createConfiguration(options: LinterOptions): Configuration {
           createRuleConfig({ severity: value as "error" | "warning" | "info" })
         );
       } else {
-        const ruleConfigInput: {
-          enabled?: boolean;
-          severity?: "error" | "warning" | "info";
-          options?: Record<string, unknown>;
-        } = { options: value };
-
-        if (value.enabled !== undefined) {
-          ruleConfigInput.enabled = value.enabled;
-        }
-        if (value.severity !== undefined) {
-          ruleConfigInput.severity = value.severity;
-        }
-
-        rules.set(id as RuleId, createRuleConfig(ruleConfigInput));
+        // Use destructuring to separate standard properties from rule-specific options
+        const { enabled, severity, ...options } = value;
+        rules.set(
+          id as RuleId,
+          createRuleConfig({
+            enabled,
+            severity: severity as "error" | "warning" | "info" | undefined,
+            options,
+          })
+        );
       }
     }
 
