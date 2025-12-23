@@ -1,34 +1,35 @@
 # MarkEdit Markdown Linter & Formatter
 
-> Validazione e formattazione automatica del Markdown secondo le migliori pratiche.
+> Automatic validation and formatting of Markdown according to best practices.
 
-Un plugin per [MarkEdit](https://github.com/MarkEdit-app/MarkEdit) che mantiene il tuo Markdown pulito, consistente e conforme agli standard, con correzioni automatiche in tempo reale.
+A plugin for [MarkEdit](https://github.com/MarkEdit-app/MarkEdit) that keeps your Markdown clean, consistent, and standards-compliant, with real-time automatic corrections.
 
-## ✨ Caratteristiche
+## Features
 
-### 🔍 Validazione in Tempo Reale
-- Controlla la qualità del Markdown mentre scrivi
-- Evidenzia problemi e suggerisce correzioni
-- Supporta configurazioni personalizzate per diversi stili
+### Real-Time Validation
+- Checks Markdown quality as you type
+- Highlights issues and suggests corrections
+- Supports custom configurations for different styles
 
-### ✅ Regole Supportate
-- **Heading**: Consistenza di stili (#, spazi, ordine gerarchico)
-- **Liste**: Formato coerente (-, *, +), indentazione corretta
-- **Link**: URL validi, testo descrittivo, evitare link rotti
-- **Immagini**: Alt text obbligatorio, percorsi relativi
-- **Codice**: Sintassi dei code block, indentazione
-- **Formattazione**: Bold/Italic, spazi, line endings
-- **Whitespace**: Righe vuote, trailing spaces, indentazione
-- **Struttura**: Tabelle markdown, blockquote, orizzontali
+### Supported Rules
+- **Headings**: Consistent styles (#, spaces, hierarchical order)
+- **Lists**: Consistent format (-, *, +), correct indentation
+- **Links**: Valid URLs, descriptive text, avoid broken links
+- **Images**: Required alt text, relative paths
+- **Code**: Code block syntax, indentation
+- **Formatting**: Bold/Italic, spaces, line endings
+- **Whitespace**: Blank lines, trailing spaces, indentation
+- **Structure**: Markdown tables, blockquotes, horizontal rules
 
-### 🔧 Formattazione Automatica
-- Corregge automaticamente problemi comuni
-- Unifica lo stile del documento
-- Preserva il significato del contenuto
-- Comando: `Format Document` (⌘+Shift+F)
+### Automatic Formatting
+- Automatically fixes common issues
+- Unifies document style
+- Preserves content meaning
+- Command: `Format Document` (Cmd+Shift+F)
 
-### ⚙️ Configurazione
-Personalizza le regole attraverso `.markdownlintrc`:
+### Configuration
+Customize rules through `.markdownlintrc`:
+```json
 {
   "rules": {
     "MD001": true,
@@ -38,98 +39,104 @@ Personalizza le regole attraverso `.markdownlintrc`:
   },
   "extends": "default"
 }
+```
 
-## 📦 Installazione
+## Installation
 
-### Tramite GitHub
-1. Scarica l'ultima release dal [repository](https://github.com/amargiovanni/MarkEdit-markdown-linter)
-2. Estrai il file `.zip`
-3. Copia in `~/Library/Application Support/MarkEdit/extensions/`
-4. Riavvia MarkEdit
+### Via GitHub
+1. Download the latest release from the [repository](https://github.com/amargiovanni/MarkEdit-markdown-linter)
+2. Extract the `.zip` file
+3. Copy to `~/Library/Application Support/MarkEdit/extensions/`
+4. Restart MarkEdit
 
-### Tramite Homebrew
+### Via Homebrew
+```bash
 brew install markedit-markdown-linter
+```
 
-## 🚀 Quick Start
+## Quick Start
 
-1. **Apri un file Markdown** in MarkEdit
-2. **Visualizza i problemi** nella gutter (marche colorate sul lato sinistro)
-3. **Usa le Quick Fix** (⌘+.) per correzioni automatiche
-4. **Formatta il documento** con ⌘+Shift+F
+1. **Open a Markdown file** in MarkEdit
+2. **View issues** in the gutter (colored markers on the left side)
+3. **Use Quick Fix** (Cmd+.) for automatic corrections
+4. **Format the document** with Cmd+Shift+F
 
-### Scorciatoie da Tastiera
+### Keyboard Shortcuts
 
-| Azione | Scorciatoia |
-|--------|-------------|
-| Quick Fix | `⌘ + .` |
-| Format Document | `⌘ + Shift + F` |
-| Toggle Plugin | `⌘ + Shift + L` |
-| Open Settings | `⌘ + Shift + ,` |
+| Action | Shortcut |
+|--------|----------|
+| Quick Fix | `Cmd + .` |
+| Format Document | `Cmd + Shift + F` |
+| Toggle Plugin | `Cmd + Shift + L` |
+| Open Settings | `Cmd + Shift + ,` |
 
-## 📋 Regole Disponibili
+## Available Rules
 
-### Livello di Severità
-- 🔴 **Error** - Problemi critici
-- 🟡 **Warning** - Problemi consigliati
-- 🔵 **Info** - Suggerimenti opzionali
+### Severity Levels
+- **Error** - Critical issues
+- **Warning** - Recommended fixes
+- **Info** - Optional suggestions
 
-| ID | Nome | Descrizione | Default |
+| ID | Name | Description | Default |
 |----|------|-------------|---------|
-| MD001 | heading-increment | Heading aumentano di 1 livello | Error |
-| MD003 | heading-style | Stile heading consistente | Warning |
-| MD004 | ul-style | Stile liste consistente | Warning |
-| MD005 | list-indent | Indentazione lista consistente | Error |
-| MD007 | ul-indent | Lista indentata correttamente | Warning |
-| MD009 | no-trailing-spaces | Nessuno spazio a fine riga | Error |
-| MD010 | no-hard-tabs | Nessun tab, solo spazi | Error |
-| MD012 | no-multiple-blanks | Max 1 riga vuota consecutiva | Warning |
-| MD013 | line-length | Max 80 caratteri per riga | Info |
-| MD014 | commands-show-output | Code block non iniziano con `$` | Info |
-| MD018 | no-missing-space-atx | Spazio dopo `#` heading | Error |
-| MD019 | no-multiple-space-atx | Un solo spazio dopo `#` | Warning |
-| MD020 | no-missing-space-closed-atx | Spazio prima di chiusura `#` | Error |
-| MD021 | no-multiple-space-closed-atx | Un solo spazio prima `#` | Warning |
-| MD022 | blanks-around-headings | Righe vuote intorno heading | Warning |
+| MD001 | heading-increment | Headings increase by 1 level at a time | Error |
+| MD003 | heading-style | Consistent heading style | Warning |
+| MD004 | ul-style | Consistent list style | Warning |
+| MD005 | list-indent | Consistent list indentation | Error |
+| MD007 | ul-indent | List indented correctly | Warning |
+| MD009 | no-trailing-spaces | No trailing spaces | Error |
+| MD010 | no-hard-tabs | No tabs, only spaces | Error |
+| MD012 | no-multiple-blanks | Max 1 consecutive blank line | Warning |
+| MD013 | line-length | Max 80 characters per line | Info |
+| MD014 | commands-show-output | Code blocks don't start with `$` | Info |
+| MD018 | no-missing-space-atx | Space after `#` in heading | Error |
+| MD019 | no-multiple-space-atx | Single space after `#` | Warning |
+| MD020 | no-missing-space-closed-atx | Space before closing `#` | Error |
+| MD021 | no-multiple-space-closed-atx | Single space before closing `#` | Warning |
+| MD022 | blanks-around-headings | Blank lines around headings | Warning |
 
-## 🎯 Casi d'Uso
+## Use Cases
 
-### Per Bloggatori
-Mantieni il blog consistente con uno stile uniforme per tutti gli articoli.
+### For Bloggers
+Keep your blog consistent with a uniform style across all articles.
 
-### Per Documentazione Tecnica
-Assicura che la documentazione segua gli standard del progetto.
+### For Technical Documentation
+Ensure documentation follows project standards.
 
-### Per Team
-Condividi `.markdownlintrc` nel repository per mantenere lo stesso stile in tutto il team.
+### For Teams
+Share `.markdownlintrc` in the repository to maintain the same style across the team.
 
-### Per Studenti/Ricercatori
-Scrivi documenti accademici ben strutturati con regole di formatting automatiche.
+### For Students/Researchers
+Write well-structured academic documents with automatic formatting rules.
 
-## 🔗 Integrazione
+## Integration
 
 ### AppleScript
-Controlla il plugin da automazioni macOS:
+Control the plugin from macOS automations:
+```applescript
 tell application "MarkEdit"
     activate
     run script "plugin:markdown-linter:format"
 end tell
+```
 
 ### Shortcuts
-Crea automazioni tramite l'app Nativa di macOS Shortcuts.
+Create automations through the native macOS Shortcuts app.
 
-## 📊 Statistiche
+## Statistics
 
-Il plugin fornisce anche metriche utili:
-- Numero totale di problemi
-- Problemi per categoria
-- % di conformità
-- Tempo medio di correzione
+The plugin also provides useful metrics:
+- Total number of issues
+- Issues by category
+- Compliance percentage
+- Average correction time
 
-## ⚙️ Configurazione Avanzata
+## Advanced Configuration
 
-### Profile di Stile
+### Style Profiles
 
 #### Google Style
+```json
 {
   "extends": "google",
   "rules": {
@@ -137,51 +144,143 @@ Il plugin fornisce anche metriche utili:
     "MD024": false
   }
 }
+```
 
-#### Commonmark Style
+#### CommonMark Style
+```json
 {
   "extends": "commonmark"
 }
+```
 
-### Ignorare Blocchi di Codice
+### Ignoring Code Blocks
+```markdown
 <!-- markdownlint-disable MD013 -->
-Questo testo ignorerà la regola MD013
+This text will ignore the MD013 rule
 <!-- markdownlint-enable MD013 -->
+```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### Il plugin non si avvia
-1. Verifica che MarkEdit sia aggiornato all'ultima versione
-2. Controlla i log: `~/Library/Logs/MarkEdit/`
-3. Ricrea la configurazione: cancella `~/.markdownlintrc`
+### The plugin won't start
+1. Verify MarkEdit is updated to the latest version
+2. Check the logs: `~/Library/Logs/MarkEdit/`
+3. Recreate the configuration: delete `~/.markdownlintrc`
 
-### Le regole non vengono applicate
-1. Verifica il file di configurazione
-2. Ricarica il plugin: Preference > Extensions > Reload
-3. Controlla che il file Markdown sia salvato
+### Rules are not being applied
+1. Verify the configuration file
+2. Reload the plugin: Preferences > Extensions > Reload
+3. Make sure the Markdown file is saved
 
-### Performance issues con file grandi
-1. Disabilita regole non necessarie
-2. Aumenta `debounce` nella configurazione
-3. Riduci la complessità delle regex personalizzate
+### Performance issues with large files
+1. Disable unnecessary rules
+2. Increase `debounce` in configuration
+3. Reduce complexity of custom regex patterns
 
-## 📖 Documentazione Completa
+## Developer API
 
-Per guide avanzate, esempi e sviluppo estensioni, visita il [wiki ufficiale](https://github.com/yourusername/MarkEdit-markdown-linter/wiki).
+### Using as a Library
 
-## 🤝 Contribuire
+Install from npm:
+```bash
+npm install markedit-linter
+```
 
-Aiutaci a migliorare! Scopri come:
+### Basic Usage with CodeMirror 6
 
-- **Segnalare bug**: Apri un [issue](https://github.com/yourusername/MarkEdit-markdown-linter/issues)
-- **Suggerire feature**: Apri una [discussion](https://github.com/yourusername/MarkEdit-markdown-linter/discussions)
-- **Contribuire codice**: Vedi [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Traduzioni**: Aiutaci a localizzare in altre lingue
+```typescript
+import { EditorView, basicSetup } from "codemirror";
+import { markdownLinter } from "markedit-linter";
 
-## 📝 Licenza
+const editor = new EditorView({
+  doc: "# Hello World\n\nSome markdown content",
+  extensions: [
+    basicSetup,
+    markdownLinter({
+      debounceMs: 300,
+      config: {
+        rules: {
+          MD013: { line_length: 120 },
+          MD010: false, // disable hard tabs rule
+        }
+      }
+    })
+  ],
+  parent: document.getElementById("editor")!
+});
+```
 
-Questo plugin è rilasciato sotto licenza **MIT**, in linea con MarkEdit.
+### Programmatic Linting
 
+```typescript
+import { LintingEngine, createDefaultConfiguration } from "markedit-linter";
+import { Text } from "@codemirror/state";
+
+const config = createDefaultConfiguration();
+const engine = new LintingEngine(config);
+const doc = Text.of(["# Hello", "", "Some text"]);
+const diagnostics = engine.lint(doc);
+
+console.log(`Found ${diagnostics.length} issues`);
+```
+
+### Custom Rules
+
+```typescript
+import { registerRule, LintRule, createDiagnostic } from "markedit-linter";
+
+const myRule: LintRule = {
+  id: "MY001",
+  name: "custom-rule",
+  description: "My custom rule",
+  tags: ["custom"],
+  severity: "warning",
+
+  check(doc, config) {
+    const diagnostics = [];
+    // Your rule logic here
+    return diagnostics;
+  },
+
+  fix(doc, diagnostic) {
+    // Optional: return a fix object
+    return null;
+  }
+};
+
+registerRule(myRule);
+```
+
+### API Reference
+
+| Export | Description |
+|--------|-------------|
+| `markdownLinter(options?)` | Creates CodeMirror extension |
+| `getDiagnostics(state)` | Gets diagnostics from editor state |
+| `formatDocument(view)` | Formats document in editor |
+| `LintingEngine` | Core linting engine class |
+| `Formatter` | Document formatting class |
+| `createAppleScriptBridge()` | AppleScript integration |
+| `calculateStatistics(diagnostics)` | Get error/warning counts |
+
+## Full Documentation
+
+For advanced guides, examples, and extension development, visit the [official wiki](https://github.com/yourusername/MarkEdit-markdown-linter/wiki).
+
+## Contributing
+
+Help us improve!
+
+- **Report bugs**: Open an [issue](https://github.com/yourusername/MarkEdit-markdown-linter/issues)
+- **Suggest features**: Open a [discussion](https://github.com/yourusername/MarkEdit-markdown-linter/discussions)
+- **Contribute code**: See [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Translations**: Help us localize to other languages
+
+## License
+
+This plugin is released under the **MIT** license, in line with MarkEdit.
+
+```
 MIT License
 
 Copyright (c) 2025 MarkEdit Contributors
@@ -195,15 +294,16 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+```
 
-## 🔗 Link Utili
+## Useful Links
 
 - **MarkEdit GitHub**: https://github.com/MarkEdit-app/MarkEdit
 - **markdownlint**: https://github.com/DavidAnson/markdownlint
 - **CodeMirror 6**: https://codemirror.net/
 - **MarkEdit API**: https://github.com/MarkEdit-app/MarkEdit/wiki
 
-## 💬 Support
+## Support
 
 - **Email**: support@example.com
 - **Mastodon**: [@MarkEditApp](https://mastodon.social/@MarkEditApp)
@@ -211,6 +311,6 @@ copies or substantial portions of the Software.
 
 ---
 
-**Fatto con ❤️ per la comunità di MarkEdit**
+**Made with love for the MarkEdit community**
 
-Versione: 1.0.0 | Ultimo aggiornamento: Dicembre 2025
+Version: 1.0.0 | Last updated: December 2025
