@@ -19,22 +19,9 @@
 import type { Text } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
+import { isCodeFence } from "./utils";
 
 const DEFAULT_INDENT = 2;
-
-/**
- * Checks if a line is inside a fenced code block.
- */
-function isInCodeBlock(lineIndex: number, lines: string[]): boolean {
-  let inCode = false;
-  for (let i = 0; i < lineIndex; i++) {
-    const line = lines[i];
-    if (line?.startsWith("```") || line?.startsWith("~~~")) {
-      inCode = !inCode;
-    }
-  }
-  return inCode;
-}
 
 /**
  * Checks if a line is an unordered list item.
@@ -65,19 +52,20 @@ export const md007: LintRule = {
     const diagnostics: Diagnostic[] = [];
     const expectedIndent =
       (config.options["indent"] as number | undefined) ?? DEFAULT_INDENT;
-    const lines: string[] = [];
+    let inCodeBlock = false;
 
-    // Collect all lines
     for (let i = 1; i <= doc.lines; i++) {
-      lines.push(doc.line(i).text);
-    }
+      const lineInfo = doc.line(i);
+      const line = lineInfo.text;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]!;
-      const lineInfo = doc.line(i + 1);
+      // Track code block state - O(n) instead of O(n²)
+      if (isCodeFence(line)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
 
       // Skip code blocks
-      if (isInCodeBlock(i, lines)) {
+      if (inCodeBlock) {
         continue;
       }
 

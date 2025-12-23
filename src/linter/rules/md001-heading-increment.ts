@@ -20,6 +20,7 @@
 import type { Text } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
+import { isCodeFence } from "./utils";
 
 /**
  * Extracts heading info from a line.
@@ -55,20 +56,6 @@ function getHeadingLevel(line: string, lineNum: number, lines: string[]): number
   return 0;
 }
 
-/**
- * Checks if a line is inside a fenced code block.
- */
-function isInCodeBlock(lineIndex: number, lines: string[]): boolean {
-  let inCode = false;
-  for (let i = 0; i < lineIndex; i++) {
-    const line = lines[i];
-    if (line?.startsWith("```") || line?.startsWith("~~~")) {
-      inCode = !inCode;
-    }
-  }
-  return inCode;
-}
-
 export const md001: LintRule = {
   id: "MD001",
   name: "heading-increment",
@@ -87,13 +74,21 @@ export const md001: LintRule = {
 
     let prevLevel = 0;
     let offset = 0;
+    let inCodeBlock = false;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       const lineLength = line.length;
 
+      // Track code block state - O(n) instead of O(n²)
+      if (isCodeFence(line)) {
+        inCodeBlock = !inCodeBlock;
+        offset += lineLength + 1;
+        continue;
+      }
+
       // Skip lines in code blocks
-      if (!isInCodeBlock(i, lines)) {
+      if (!inCodeBlock) {
         const level = getHeadingLevel(line, i, lines);
 
         if (level > 0) {

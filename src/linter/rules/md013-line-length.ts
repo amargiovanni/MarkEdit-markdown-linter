@@ -17,22 +17,9 @@
 import type { Text } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
+import { isCodeFence } from "./utils";
 
 const DEFAULT_LINE_LENGTH = 80;
-
-/**
- * Checks if a line is inside a fenced code block.
- */
-function isInCodeBlock(lineIndex: number, lines: string[]): boolean {
-  let inCode = false;
-  for (let i = 0; i < lineIndex; i++) {
-    const line = lines[i];
-    if (line?.startsWith("```") || line?.startsWith("~~~")) {
-      inCode = !inCode;
-    }
-  }
-  return inCode;
-}
 
 /**
  * Checks if a line contains a URL.
@@ -62,16 +49,17 @@ export const md013: LintRule = {
     const checkCodeBlocks = (config.options["code_blocks"] as boolean | undefined) ?? true;
     const checkHeadings = (config.options["headings"] as boolean | undefined) ?? true;
 
-    const lines: string[] = [];
+    let inCodeBlock = false;
 
-    // Collect all lines
     for (let i = 1; i <= doc.lines; i++) {
-      lines.push(doc.line(i).text);
-    }
+      const lineInfo = doc.line(i);
+      const line = lineInfo.text;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]!;
-      const lineInfo = doc.line(i + 1);
+      // Track code block state - O(n) instead of O(n²)
+      if (isCodeFence(line)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
 
       // Skip empty lines
       if (line.length === 0) {
@@ -79,13 +67,7 @@ export const md013: LintRule = {
       }
 
       // Skip code blocks if configured
-      const inCodeBlock = isInCodeBlock(i, lines);
       if (inCodeBlock && !checkCodeBlocks) {
-        continue;
-      }
-
-      // Skip code fence lines themselves
-      if (line.startsWith("```") || line.startsWith("~~~")) {
         continue;
       }
 

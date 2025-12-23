@@ -20,26 +20,13 @@
 import type { Text } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
+import { isCodeFence } from "./utils";
 
 interface ListItemInfo {
   line: number;
   indent: number;
   from: number;
   to: number;
-}
-
-/**
- * Checks if a line is inside a fenced code block.
- */
-function isInCodeBlock(lineIndex: number, lines: string[]): boolean {
-  let inCode = false;
-  for (let i = 0; i < lineIndex; i++) {
-    const line = lines[i];
-    if (line?.startsWith("```") || line?.startsWith("~~~")) {
-      inCode = !inCode;
-    }
-  }
-  return inCode;
 }
 
 /**
@@ -77,13 +64,20 @@ export const md005: LintRule = {
     }
 
     const listItems: ListItemInfo[] = [];
+    let inCodeBlock = false;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       const lineInfo = doc.line(i + 1);
 
+      // Track code block state - O(n) instead of O(n²)
+      if (isCodeFence(line)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+
       // Skip code blocks
-      if (isInCodeBlock(i, lines)) {
+      if (inCodeBlock) {
         continue;
       }
 

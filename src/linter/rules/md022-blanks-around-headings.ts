@@ -23,20 +23,7 @@
 import type { Text } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
-
-/**
- * Checks if a line is inside a fenced code block.
- */
-function isInCodeBlock(lineIndex: number, lines: string[]): boolean {
-  let inCode = false;
-  for (let i = 0; i < lineIndex; i++) {
-    const line = lines[i];
-    if (line?.startsWith("```") || line?.startsWith("~~~")) {
-      inCode = !inCode;
-    }
-  }
-  return inCode;
-}
+import { isCodeFence } from "./utils";
 
 /**
  * Checks if a line is a blank line.
@@ -68,12 +55,20 @@ export const md022: LintRule = {
       lines.push(doc.line(i).text);
     }
 
+    let inCodeBlock = false;
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       const lineInfo = doc.line(i + 1);
 
+      // Track code block state - O(n) instead of O(n²)
+      if (isCodeFence(line)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+
       // Skip code blocks
-      if (isInCodeBlock(i, lines)) {
+      if (inCodeBlock) {
         continue;
       }
 
@@ -85,7 +80,7 @@ export const md022: LintRule = {
       // Check for blank line before (unless first line)
       if (i > 0) {
         const prevLine = lines[i - 1]!;
-        if (!isBlankLine(prevLine)) {
+        if (!isBlankLine(prevLine) && !isCodeFence(prevLine)) {
           diagnostics.push(
             createDiagnostic({
               from: lineInfo.from,
@@ -101,7 +96,7 @@ export const md022: LintRule = {
       // Check for blank line after (unless last line)
       if (i < lines.length - 1) {
         const nextLine = lines[i + 1]!;
-        if (!isBlankLine(nextLine)) {
+        if (!isBlankLine(nextLine) && !isCodeFence(nextLine)) {
           diagnostics.push(
             createDiagnostic({
               from: lineInfo.from,

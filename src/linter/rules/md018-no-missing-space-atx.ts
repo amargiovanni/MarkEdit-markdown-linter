@@ -17,20 +17,7 @@
 import type { Text, ChangeSpec } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
-
-/**
- * Checks if a line is inside a fenced code block.
- */
-function isInCodeBlock(lineIndex: number, lines: string[]): boolean {
-  let inCode = false;
-  for (let i = 0; i < lineIndex; i++) {
-    const line = lines[i];
-    if (line?.startsWith("```") || line?.startsWith("~~~")) {
-      inCode = !inCode;
-    }
-  }
-  return inCode;
-}
+import { isCodeFence } from "./utils";
 
 export const md018: LintRule = {
   id: "MD018",
@@ -41,16 +28,17 @@ export const md018: LintRule = {
 
   check(doc: Text, _config: RuleConfig): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    const lines: string[] = [];
+    let inCodeBlock = false;
 
-    // Collect all lines
     for (let i = 1; i <= doc.lines; i++) {
-      lines.push(doc.line(i).text);
-    }
+      const lineInfo = doc.line(i);
+      const line = lineInfo.text;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]!;
-      const lineInfo = doc.line(i + 1);
+      // Track code block state - O(n) instead of O(n²)
+      if (isCodeFence(line)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
 
       // Skip indented lines
       if (line.startsWith(" ") || line.startsWith("\t")) {
@@ -58,7 +46,7 @@ export const md018: LintRule = {
       }
 
       // Skip lines in code blocks
-      if (isInCodeBlock(i, lines)) {
+      if (inCodeBlock) {
         continue;
       }
 
