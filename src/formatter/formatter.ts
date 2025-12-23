@@ -4,7 +4,7 @@
  * @module formatter/formatter
  */
 
-import { Text, type ChangeSpec } from "@codemirror/state";
+import { Text, ChangeSet, type ChangeSpec } from "@codemirror/state";
 import type { Diagnostic } from "../linter/types";
 import { LintingEngine } from "../linter/engine";
 import { collectFixes, isFixable, type Fix } from "./fixes";
@@ -59,25 +59,11 @@ export class Formatter {
         break;
       }
 
-      // Apply fixes from end to start to maintain positions
-      const sortedFixes = [...fixes].sort((a, b) => {
-        const aChange = a.change as { from: number };
-        const bChange = b.change as { from: number };
-        return bChange.from - aChange.from;
-      });
-
-      // Apply all fixes to create new document
-      let text = currentDoc.toString();
-
-      for (const fix of sortedFixes) {
-        const change = fix.change as { from: number; to: number; insert?: string };
-        const before = text.slice(0, change.from);
-        const after = text.slice(change.to);
-        text = before + (change.insert ?? "") + after;
-        allChanges.push(fix.change);
-      }
-
-      currentDoc = Text.of(text.split("\n"));
+      // Use ChangeSet to properly handle overlapping/adjacent fixes
+      const changes = fixes.map((f) => f.change);
+      const changeSet = ChangeSet.of(changes, currentDoc.length);
+      allChanges.push(...changes);
+      currentDoc = changeSet.apply(currentDoc);
       iteration++;
     }
 
@@ -107,10 +93,7 @@ export class Formatter {
    * @returns New document text
    */
   applySingleFix(doc: Text, fix: Fix): string {
-    const change = fix.change as { from: number; to: number; insert?: string };
-    const text = doc.toString();
-    const before = text.slice(0, change.from);
-    const after = text.slice(change.to);
-    return before + (change.insert ?? "") + after;
+    const changeSet = ChangeSet.of([fix.change], doc.length);
+    return changeSet.apply(doc).toString();
   }
 }
