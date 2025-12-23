@@ -23,10 +23,10 @@ function getDefaultRuleConfig(ruleId: RuleId): RuleConfig {
   let config = defaultConfigCache.get(ruleId);
   if (config === undefined) {
     const rule = getRule(ruleId);
-    config = createRuleConfig({
-      enabled: true,
-      severity: rule?.severity,
-    });
+    // Only include severity if rule exists and has a severity defined
+    config = rule?.severity
+      ? createRuleConfig({ enabled: true, severity: rule.severity })
+      : createRuleConfig({ enabled: true });
     defaultConfigCache.set(ruleId, config);
   }
   return config;
