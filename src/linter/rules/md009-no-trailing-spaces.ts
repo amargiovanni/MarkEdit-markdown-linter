@@ -18,6 +18,9 @@ import type { Text, ChangeSpec } from "@codemirror/state";
 import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
 
+// Pre-compiled regex pattern for better performance
+const TRAILING_WHITESPACE_PATTERN = /(\s+)$/;
+
 export const md009: LintRule = {
   id: "MD009",
   name: "no-trailing-spaces",
@@ -34,7 +37,7 @@ export const md009: LintRule = {
       const line = lineInfo.text;
 
       // Find trailing whitespace
-      const match = /(\s+)$/.exec(line);
+      const match = TRAILING_WHITESPACE_PATTERN.exec(line);
       if (match?.[1]) {
         const trailingLength = match[1].length;
 

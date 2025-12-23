@@ -11,6 +11,29 @@ import { createRuleConfig } from "../linter/types";
 import { getRule } from "../linter/rules/index";
 
 /**
+ * Cache for default RuleConfig objects to avoid repeated allocations.
+ * Maps RuleId to its default config.
+ */
+const defaultConfigCache = new Map<RuleId, RuleConfig>();
+
+/**
+ * Gets or creates a default RuleConfig for a rule.
+ * Uses caching to avoid repeated allocations.
+ */
+function getDefaultRuleConfig(ruleId: RuleId): RuleConfig {
+  let config = defaultConfigCache.get(ruleId);
+  if (config === undefined) {
+    const rule = getRule(ruleId);
+    config = createRuleConfig({
+      enabled: true,
+      severity: rule?.severity,
+    });
+    defaultConfigCache.set(ruleId, config);
+  }
+  return config;
+}
+
+/**
  * Represents a single quick fix action.
  */
 export interface QuickFix {
@@ -42,11 +65,8 @@ export function getQuickFixesForDiagnostic(
     return [];
   }
 
-  // Get the rule config from the map, or create a default one
-  const config = configMap?.get(diagnostic.source) ?? createRuleConfig({
-    enabled: true,
-    severity: rule.severity,
-  });
+  // Get the rule config from the map, or use cached default
+  const config = configMap?.get(diagnostic.source) ?? getDefaultRuleConfig(diagnostic.source);
 
   const change = rule.fix(doc, diagnostic, config);
   if (!change) {

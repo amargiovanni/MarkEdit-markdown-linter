@@ -19,6 +19,9 @@ import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
 import { isCodeFence } from "./utils";
 
+// Pre-compiled regex pattern for better performance
+const MULTIPLE_SPACES_PATTERN = /^(#{1,6})( {2,})(\S)/;
+
 export const md019: LintRule = {
   id: "MD019",
   name: "no-multiple-space-atx",
@@ -52,7 +55,7 @@ export const md019: LintRule = {
 
       // Match ATX heading with multiple spaces after #
       // Pattern: 1-6 hashes followed by 2+ spaces, then content
-      const match = /^(#{1,6})( {2,})(\S)/.exec(line);
+      const match = MULTIPLE_SPACES_PATTERN.exec(line);
       if (match?.[1] && match[2] && match[3]) {
         const hashCount = match[1].length;
         const spaceCount = match[2].length;

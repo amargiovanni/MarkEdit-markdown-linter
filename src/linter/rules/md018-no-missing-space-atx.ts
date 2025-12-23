@@ -19,6 +19,10 @@ import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
 import { isCodeFence } from "./utils";
 
+// Pre-compiled regex patterns for better performance
+const MISSING_SPACE_PATTERN = /^(#{1,6})([^\s#])/;
+const HASH_PREFIX_PATTERN = /^(#{1,6})/;
+
 export const md018: LintRule = {
   id: "MD018",
   name: "no-missing-space-atx",
@@ -52,7 +56,7 @@ export const md018: LintRule = {
 
       // Match ATX heading without space after #
       // Pattern: 1-6 hashes followed immediately by non-space, non-# character
-      const match = /^(#{1,6})([^\s#])/.exec(line);
+      const match = MISSING_SPACE_PATTERN.exec(line);
       if (match?.[1] && match[2]) {
         const hashCount = match[1].length;
 
@@ -75,7 +79,7 @@ export const md018: LintRule = {
     // Find where to insert the space (after the # characters)
     const lineInfo = doc.lineAt(diagnostic.from);
     const line = lineInfo.text;
-    const match = /^(#{1,6})/.exec(line);
+    const match = HASH_PREFIX_PATTERN.exec(line);
 
     if (match?.[1]) {
       const insertPos = lineInfo.from + match[1].length;

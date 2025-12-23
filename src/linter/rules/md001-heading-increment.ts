@@ -22,34 +22,34 @@ import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
 import { isCodeFence } from "./utils";
 
+// Pre-compiled regex patterns for better performance
+const ATX_HEADING_PATTERN = /^(#{1,6})(?:\s|$)/;
+const SETEXT_H1_PATTERN = /^=+\s*$/;
+const SETEXT_H2_PATTERN = /^-{3,}\s*$/;
+
 /**
  * Extracts heading info from a line.
  * Returns the heading level (1-6) or 0 if not a heading.
  */
-function getHeadingLevel(line: string, lineNum: number, lines: string[]): number {
-  const trimmed = line.trimStart();
-
+function getHeadingLevel(line: string, prevLine: string | null): number {
   // Skip if line has leading whitespace (indented = not a heading in strict MD)
-  if (line !== trimmed && line.startsWith(" ")) {
+  if (line.startsWith(" ")) {
     return 0;
   }
 
   // ATX-style headings: # through ######
-  const atxMatch = /^(#{1,6})(?:\s|$)/.exec(line);
+  const atxMatch = ATX_HEADING_PATTERN.exec(line);
   if (atxMatch?.[1]) {
     return atxMatch[1].length;
   }
 
   // Setext-style headings: underlined with = or -
-  if (lineNum > 0) {
-    const prevLine = lines[lineNum - 1];
-    if (prevLine && prevLine.trim().length > 0) {
-      if (/^=+\s*$/.test(line)) {
-        return 1; // h1
-      }
-      if (/^-+\s*$/.test(line) && line.length >= 3) {
-        return 2; // h2
-      }
+  if (prevLine !== null && prevLine.trim().length > 0) {
+    if (SETEXT_H1_PATTERN.test(line)) {
+      return 1; // h1
+    }
+    if (SETEXT_H2_PATTERN.test(line)) {
+      return 2; // h2
     }
   }
 
@@ -65,39 +65,33 @@ export const md001: LintRule = {
 
   check(doc: Text, _config: RuleConfig): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    const lines: string[] = [];
-
-    // Collect all lines
-    for (let i = 1; i <= doc.lines; i++) {
-      lines.push(doc.line(i).text);
-    }
 
     let prevLevel = 0;
-    let offset = 0;
     let inCodeBlock = false;
+    let prevLineText: string | null = null;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]!;
-      const lineLength = line.length;
+    for (let i = 1; i <= doc.lines; i++) {
+      const lineInfo = doc.line(i);
+      const line = lineInfo.text;
 
       // Track code block state - O(n) instead of O(n²)
       if (isCodeFence(line)) {
         inCodeBlock = !inCodeBlock;
-        offset += lineLength + 1;
+        prevLineText = line;
         continue;
       }
 
       // Skip lines in code blocks
       if (!inCodeBlock) {
-        const level = getHeadingLevel(line, i, lines);
+        const level = getHeadingLevel(line, prevLineText);
 
         if (level > 0) {
           // Check for skipped levels
           if (prevLevel > 0 && level > prevLevel + 1) {
             diagnostics.push(
               createDiagnostic({
-                from: offset,
-                to: offset + lineLength,
+                from: lineInfo.from,
+                to: lineInfo.to,
                 severity: "error",
                 message: `Heading level should not skip from h${prevLevel} to h${level}`,
                 source: "MD001",
@@ -108,8 +102,7 @@ export const md001: LintRule = {
         }
       }
 
-      // Move offset past this line (including newline)
-      offset += lineLength + 1;
+      prevLineText = line;
     }
 
     return diagnostics;

@@ -13,6 +13,11 @@ import { isValidRuleId } from "../types";
 const registry = new Map<RuleId, LintRule>();
 
 /**
+ * Cached sorted array of all rules. Invalidated on registration.
+ */
+let cachedRulesArray: LintRule[] | null = null;
+
+/**
  * Registers a new linting rule.
  *
  * @param rule - The rule to register
@@ -30,6 +35,8 @@ export function registerRule(rule: LintRule): void {
   }
 
   registry.set(rule.id, rule);
+  // Invalidate cache when a new rule is registered
+  cachedRulesArray = null;
 }
 
 /**
@@ -44,11 +51,15 @@ export function getRule(id: RuleId): LintRule | undefined {
 
 /**
  * Gets all registered rules, sorted by ID.
+ * Results are cached for O(1) performance on subsequent calls.
  *
  * @returns Array of all registered rules
  */
-export function getAllRules(): LintRule[] {
-  return [...registry.values()].sort((a, b) => a.id.localeCompare(b.id));
+export function getAllRules(): readonly LintRule[] {
+  if (cachedRulesArray === null) {
+    cachedRulesArray = [...registry.values()].sort((a, b) => a.id.localeCompare(b.id));
+  }
+  return cachedRulesArray;
 }
 
 /**
@@ -67,6 +78,7 @@ export function getRulesByTag(tag: string): LintRule[] {
  */
 export function clearRegistry(): void {
   registry.clear();
+  cachedRulesArray = null;
 }
 
 /**

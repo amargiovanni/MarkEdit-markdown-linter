@@ -21,18 +21,22 @@ import { isCodeFence } from "./utils";
 
 const DEFAULT_LINE_LENGTH = 80;
 
+// Pre-compiled regex patterns for better performance
+const URL_PATTERN = /https?:\/\/\S+/;
+const HEADING_PATTERN = /^#{1,6}\s/;
+
 /**
  * Checks if a line contains a URL.
  */
 function containsUrl(line: string): boolean {
-  return /https?:\/\/\S+/.test(line);
+  return URL_PATTERN.test(line);
 }
 
 /**
  * Checks if a line is a heading.
  */
 function isHeading(line: string): boolean {
-  return /^#{1,6}\s/.test(line);
+  return HEADING_PATTERN.test(line);
 }
 
 export const md013: LintRule = {

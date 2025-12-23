@@ -23,6 +23,11 @@ import type { LintRule, RuleConfig, Diagnostic } from "../types";
 import { createDiagnostic } from "../types";
 import { isCodeFence } from "./utils";
 
+// Pre-compiled regex patterns for better performance
+const ATX_HEADING_PATTERN = /^#{1,6}\s/;
+const SETEXT_H1_PATTERN = /^=+\s*$/;
+const SETEXT_H2_PATTERN = /^-{3,}\s*$/;
+
 type HeadingStyle = "atx" | "atx_closed" | "setext" | "consistent";
 
 interface HeadingInfo {
@@ -42,65 +47,65 @@ export const md003: LintRule = {
   check(doc: Text, config: RuleConfig): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
     const style = (config.options["style"] as HeadingStyle | undefined) ?? "consistent";
-    const lines: string[] = [];
-
-    // Collect all lines
-    for (let i = 1; i <= doc.lines; i++) {
-      lines.push(doc.line(i).text);
-    }
 
     const headings: HeadingInfo[] = [];
     let inCodeBlock = false;
+    let prevLineText: string | null = null;
+    let prevLineInfo: { from: number; to: number } | null = null;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]!;
-      const lineInfo = doc.line(i + 1);
+    for (let i = 1; i <= doc.lines; i++) {
+      const lineInfo = doc.line(i);
+      const line = lineInfo.text;
 
       // Track code block state - O(n) instead of O(n²)
       if (isCodeFence(line)) {
         inCodeBlock = !inCodeBlock;
+        prevLineText = line;
+        prevLineInfo = { from: lineInfo.from, to: lineInfo.to };
         continue;
       }
 
       // Skip code blocks
       if (inCodeBlock) {
+        prevLineText = line;
+        prevLineInfo = { from: lineInfo.from, to: lineInfo.to };
         continue;
       }
 
       // Check for ATX heading (# style)
-      if (/^#{1,6}\s/.test(line)) {
+      if (ATX_HEADING_PATTERN.test(line)) {
         headings.push({
-          line: i + 1,
+          line: i,
           style: "atx",
           from: lineInfo.from,
           to: lineInfo.to,
         });
+        prevLineText = line;
+        prevLineInfo = { from: lineInfo.from, to: lineInfo.to };
         continue;
       }
 
       // Check for setext heading (underline style)
-      if (i > 0) {
-        const prevLine = lines[i - 1]!;
-        if (/^=+\s*$/.test(line) && prevLine.trim().length > 0) {
-          const prevLineInfo = doc.line(i);
+      if (prevLineText !== null && prevLineText.trim().length > 0 && prevLineInfo !== null) {
+        if (SETEXT_H1_PATTERN.test(line)) {
           headings.push({
-            line: i,
+            line: i - 1,
             style: "setext",
             from: prevLineInfo.from,
             to: lineInfo.to,
           });
-          continue;
-        }
-        if (/^-+\s*$/.test(line) && prevLine.trim().length > 0 && line.length >= 3) {
-          const prevLineInfo = doc.line(i);
+        } else if (SETEXT_H2_PATTERN.test(line)) {
           headings.push({
-            line: i,
+            line: i - 1,
             style: "setext",
             from: prevLineInfo.from,
             to: lineInfo.to,
           });
         }
       }
+
+      prevLineText = line;
+      prevLineInfo = { from: lineInfo.from, to: lineInfo.to };
     }
 
     if (headings.length === 0) {

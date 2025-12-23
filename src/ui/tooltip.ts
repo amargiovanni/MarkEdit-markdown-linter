@@ -120,31 +120,23 @@ function createTooltipDOM(diagnostics: readonly Diagnostic[]): HTMLElement {
 /**
  * Creates a hover tooltip extension for diagnostics.
  *
- * @param getDiagnostics - Function to get diagnostics at a position
+ * @param getDiagnostics - Function to get diagnostics at a position (should already be filtered by position)
  * @returns CodeMirror hover tooltip extension
  */
 export function lintTooltip(getDiagnostics: DiagnosticsProvider): Extension {
   return hoverTooltip((view: EditorView, pos: number): Tooltip | null => {
+    // getDiagnostics should return diagnostics already filtered by position
     const diagnostics = getDiagnostics(view, pos);
 
     if (diagnostics.length === 0) {
       return null;
     }
 
-    // Filter to diagnostics that contain this position
-    const relevantDiags = diagnostics.filter(
-      (d) => pos >= d.from && pos <= d.to
-    );
-
-    if (relevantDiags.length === 0) {
-      return null;
-    }
-
     return {
-      pos: relevantDiags[0]!.from,
+      pos: diagnostics[0]!.from,
       above: true,
       create: () => ({
-        dom: createTooltipDOM(relevantDiags),
+        dom: createTooltipDOM(diagnostics),
       }),
     };
   });
