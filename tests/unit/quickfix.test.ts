@@ -11,7 +11,6 @@ import { createDiagnostic } from "../../src/linter/types";
 import {
   getQuickFixesForPosition,
   getQuickFixesForDiagnostic,
-  type QuickFix,
 } from "../../src/ui/quickfix";
 import { registerRule, clearRegistry } from "../../src/linter/rules/index";
 import { md009 } from "../../src/linter/rules/md009-no-trailing-spaces";

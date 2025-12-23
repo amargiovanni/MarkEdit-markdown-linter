@@ -4,7 +4,7 @@
  * @module tests/unit/rules/md003
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { Text } from "@codemirror/state";
 import { md003 } from "../../../src/linter/rules/md003-heading-style";
 import { createRuleConfig } from "../../../src/linter/types";

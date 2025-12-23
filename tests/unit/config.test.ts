@@ -4,7 +4,7 @@
  * @module tests/unit/config
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   parseConfig,
   mergeConfigs,
