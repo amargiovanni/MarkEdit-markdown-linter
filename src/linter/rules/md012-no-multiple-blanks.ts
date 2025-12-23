@@ -78,17 +78,16 @@ export const md012: LintRule = {
     return diagnostics;
   },
 
-  fix(doc: Text, diagnostic: Diagnostic): ChangeSpec | null {
-    // Replace multiple blank lines with maximum allowed blank lines (default 1)
-    // The fix doesn't have access to config, so we use the default of 1
-    const DEFAULT_MAXIMUM = 1;
+  fix(doc: Text, diagnostic: Diagnostic, config: RuleConfig): ChangeSpec | null {
+    // Replace multiple blank lines with maximum allowed blank lines
+    const maximum = (config.options["maximum"] as number | undefined) ?? 1;
 
     // Find the first blank line in the range
     const lineStart = doc.lineAt(diagnostic.from);
 
     // Keep maximum blank lines, remove the rest
     // A blank line is represented by a newline character
-    const blankLines = "\n".repeat(DEFAULT_MAXIMUM);
+    const blankLines = "\n".repeat(maximum);
 
     return {
       from: lineStart.from,

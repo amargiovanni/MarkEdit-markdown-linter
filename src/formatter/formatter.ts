@@ -50,10 +50,11 @@ export class Formatter {
     const allChanges: ChangeSpec[] = [];
     let currentDoc = doc;
     let iteration = 0;
+    const configMap = this.engine.getConfig().rules;
 
     while (iteration < maxIterations) {
       const diagnostics = this.engine.lint(currentDoc);
-      const fixes = collectFixes(currentDoc, diagnostics);
+      const fixes = collectFixes(currentDoc, diagnostics, configMap);
 
       if (fixes.length === 0) {
         break;

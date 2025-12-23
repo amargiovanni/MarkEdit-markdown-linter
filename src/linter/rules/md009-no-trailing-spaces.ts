@@ -61,7 +61,7 @@ export const md009: LintRule = {
     return diagnostics;
   },
 
-  fix(_doc: Text, diagnostic: Diagnostic): ChangeSpec | null {
+  fix(_doc: Text, diagnostic: Diagnostic, _config: RuleConfig): ChangeSpec | null {
     return {
       from: diagnostic.from,
       to: diagnostic.to,

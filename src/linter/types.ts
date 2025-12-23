@@ -192,11 +192,13 @@ export type CheckFunction = (doc: Text, config: RuleConfig) => Diagnostic[];
  *
  * @param doc - CodeMirror document
  * @param diagnostic - The diagnostic to fix
+ * @param config - Rule configuration (for accessing rule-specific options)
  * @returns Change specification or null if unfixable
  */
 export type FixFunction = (
   doc: Text,
-  diagnostic: Diagnostic
+  diagnostic: Diagnostic,
+  config: RuleConfig
 ) => ChangeSpec | null;
 
 /**

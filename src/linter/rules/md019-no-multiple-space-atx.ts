@@ -72,7 +72,7 @@ export const md019: LintRule = {
     return diagnostics;
   },
 
-  fix(_doc: Text, diagnostic: Diagnostic): ChangeSpec | null {
+  fix(_doc: Text, diagnostic: Diagnostic, _config: RuleConfig): ChangeSpec | null {
     // Replace multiple spaces with single space
     return {
       from: diagnostic.from,

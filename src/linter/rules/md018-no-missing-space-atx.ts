@@ -71,7 +71,7 @@ export const md018: LintRule = {
     return diagnostics;
   },
 
-  fix(doc: Text, diagnostic: Diagnostic): ChangeSpec | null {
+  fix(doc: Text, diagnostic: Diagnostic, _config: RuleConfig): ChangeSpec | null {
     // Find where to insert the space (after the # characters)
     const lineInfo = doc.lineAt(diagnostic.from);
     const line = lineInfo.text;

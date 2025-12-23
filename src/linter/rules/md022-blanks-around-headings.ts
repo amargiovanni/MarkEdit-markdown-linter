@@ -113,7 +113,7 @@ export const md022: LintRule = {
     return diagnostics;
   },
 
-  fix(doc: Text, diagnostic: Diagnostic): { from: number; to: number; insert: string } | null {
+  fix(doc: Text, diagnostic: Diagnostic, _config: RuleConfig): { from: number; to: number; insert: string } | null {
     // Find the line with the heading
     const lineNumber = doc.lineAt(diagnostic.from).number;
     const lineInfo = doc.line(lineNumber);

@@ -71,7 +71,7 @@ export const md010: LintRule = {
     return diagnostics;
   },
 
-  fix(_doc: Text, diagnostic: Diagnostic): ChangeSpec | null {
+  fix(_doc: Text, diagnostic: Diagnostic, _config: RuleConfig): ChangeSpec | null {
     // Replace tab with 4 spaces
     return {
       from: diagnostic.from,

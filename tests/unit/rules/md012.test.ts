@@ -94,7 +94,7 @@ describe("MD012: no-multiple-blanks", () => {
       const diagnostics = md012.check(doc, config);
       expect(diagnostics).toHaveLength(1);
 
-      const fix = md012.fix?.(doc, diagnostics[0]!);
+      const fix = md012.fix?.(doc, diagnostics[0]!, config);
       expect(fix).toBeDefined();
 
       // The fix should insert a single newline (one blank line)
@@ -107,11 +107,24 @@ describe("MD012: no-multiple-blanks", () => {
       const diagnostics = md012.check(doc, config);
       expect(diagnostics).toHaveLength(1);
 
-      const fix = md012.fix?.(doc, diagnostics[0]!);
+      const fix = md012.fix?.(doc, diagnostics[0]!, config);
       const change = fix as { from: number; to: number; insert: string };
 
       // Should insert 1 newline to keep 1 blank line
       expect(change.insert).toBe("\n");
+    });
+
+    it("respects maximum option in fix", () => {
+      const configMax2 = createRuleConfig({ options: { maximum: 2 } });
+      const doc = Text.of(["Line 1", "", "", "", "Line 2"]);
+      const diagnostics = md012.check(doc, configMax2);
+      expect(diagnostics).toHaveLength(1);
+
+      const fix = md012.fix?.(doc, diagnostics[0]!, configMax2);
+      const change = fix as { from: number; to: number; insert: string };
+
+      // Should insert 2 newlines to keep 2 blank lines
+      expect(change.insert).toBe("\n\n");
     });
   });
 });

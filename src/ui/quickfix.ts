@@ -6,7 +6,8 @@
 
 import type { Text, ChangeSpec } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
-import type { Diagnostic } from "../linter/types";
+import type { Diagnostic, RuleConfig, RuleId } from "../linter/types";
+import { createRuleConfig } from "../linter/types";
 import { getRule } from "../linter/rules/index";
 
 /**
@@ -28,18 +29,26 @@ export interface QuickFix {
  *
  * @param doc - The document
  * @param diagnostic - The diagnostic to get fixes for
+ * @param configMap - Optional map of rule configurations
  * @returns Array of available quick fixes
  */
 export function getQuickFixesForDiagnostic(
   doc: Text,
-  diagnostic: Diagnostic
+  diagnostic: Diagnostic,
+  configMap?: ReadonlyMap<RuleId, RuleConfig>
 ): QuickFix[] {
   const rule = getRule(diagnostic.source);
   if (!rule?.fix) {
     return [];
   }
 
-  const change = rule.fix(doc, diagnostic);
+  // Get the rule config from the map, or create a default one
+  const config = configMap?.get(diagnostic.source) ?? createRuleConfig({
+    enabled: true,
+    severity: rule.severity,
+  });
+
+  const change = rule.fix(doc, diagnostic, config);
   if (!change) {
     return [];
   }
@@ -63,19 +72,21 @@ export function getQuickFixesForDiagnostic(
  * @param doc - The document
  * @param diagnostics - All diagnostics in the document
  * @param pos - The cursor position
+ * @param configMap - Optional map of rule configurations
  * @returns Array of available quick fixes at the position
  */
 export function getQuickFixesForPosition(
   doc: Text,
   diagnostics: readonly Diagnostic[],
-  pos: number
+  pos: number,
+  configMap?: ReadonlyMap<RuleId, RuleConfig>
 ): QuickFix[] {
   const fixes: QuickFix[] = [];
 
   // Find all diagnostics that cover the position
   for (const diagnostic of diagnostics) {
     if (pos >= diagnostic.from && pos <= diagnostic.to) {
-      const diagFixes = getQuickFixesForDiagnostic(doc, diagnostic);
+      const diagFixes = getQuickFixesForDiagnostic(doc, diagnostic, configMap);
       fixes.push(...diagFixes);
     }
   }
